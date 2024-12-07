@@ -1,5 +1,5 @@
 data = []
-with open("data2.txt", "r") as file:
+with open("data.txt", "r") as file:
     for line in file.readlines():
         line = line.strip()
         target = line.split(":")[0]
@@ -11,32 +11,25 @@ def concatenate(a, b):
     return int(f"{a}{b}")
 
 
-def check_sum(target, elements):
-    if len(elements) == 1:
-        if elements[0] == target:
+def check_sum(target, elements, cur):
+    if len(elements) == 0:
+        if cur == target:
             return True
         return False
 
-    if len(elements) == 0:
-        return target == 0
-
-    concat_end = concatenate(elements[-2], elements[-1])
-    if len(elements) == 2 and concat_end == target:
-        return True
-
-    a = check_sum(target / elements[-1], elements[:-1])
+    a = check_sum(target, elements[1:], cur * elements[0])
     if a:
         return True
-    b = check_sum(target - elements[-1], elements[:-1])
+    b = check_sum(target, elements[1:], cur + elements[0])
     if b:
         return True
 
-    return check_sum(target - concat_end, elements[:-2])
+    concat = concatenate(cur, elements[0])
+    return check_sum(target, elements[1:], concat)
 
 
 res = 0
 for dat in data:
-    if check_sum(dat[0], dat[1:]):
-        print(dat)
+    if check_sum(dat[0], dat[2:], dat[1]):
         res += dat[0]
 print(res)
