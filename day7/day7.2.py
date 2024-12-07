@@ -1,3 +1,5 @@
+import time
+
 data = []
 with open("data.txt", "r") as file:
     for line in file.readlines():
@@ -29,7 +31,9 @@ def check_sum(target, elements, cur):
 
 
 res = 0
+start_time = time.time()
 for dat in data:
     if check_sum(dat[0], dat[2:], dat[1]):
         res += dat[0]
 print(res)
+print("--- %s seconds ---" % (time.time() - start_time))
