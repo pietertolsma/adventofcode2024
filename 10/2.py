@@ -37,7 +37,6 @@ def find_distinct_paths_to_nine(start_r, start_c):
 
     count = 0
     while len(queue):
-        # Remove first item from list
         (cur_r, cur_c, seen) = queue.pop()
 
         seen.add((cur_r, cur_c))
