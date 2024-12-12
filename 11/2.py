@@ -30,11 +30,13 @@ def simulate_step(data):
 
 
 start_time = time()
-for i in range(75):
+for i in range(7500):
     counts = simulate_step(counts)
 
 res = 0
 for num, count in counts.items():
     res += count
+
+print(counts)
 
 print("--- %s seconds ---" % (time() - start_time))
