@@ -22,7 +22,7 @@ def is_same_symbol(target, r, c):
     return in_bounds(r, c) and target == grid[r][c]
 
 
-def bfs_region_search(start_r, start_c):
+def dfs_region_search(start_r, start_c):
     visited[start_r][start_c] = True
 
     symbol = grid[start_r][start_c]
@@ -72,7 +72,7 @@ def aggregate_regions():
         for c in range(COLS):
             if visited[r][c]:
                 continue
-            area, fences = bfs_region_search(r, c)
+            area, fences = dfs_region_search(r, c)
 
             sum += area * fences
 
