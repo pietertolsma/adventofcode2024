@@ -21,14 +21,14 @@ for match in matches:
         (
             np.array(
                 [
-                    [int(match[0]), int(match[2]) * 3],
-                    [int(match[1]), int(match[3]) * 3],
+                    [int(match[0]), int(match[2])],
+                    [int(match[1]), int(match[3])],
                 ]
             ).astype(int),
             np.array(
                 [
-                    (int(match[4]) + 10000000000000) * 3,
-                    (int(match[5]) + 10000000000000) * 3,
+                    (int(match[4]) + 10000000000000),
+                    (int(match[5]) + 10000000000000),
                 ]
             ).astype(int),
         )
@@ -38,16 +38,41 @@ total_cost = 0
 prizes = 0
 
 
+def solve(A, b):
+    ax, bx, ay, by, px, py = A[0][0], A[0][1], A[1][0], A[1][1], b[0], b[1]
+
+    top = px * ay - py * ax
+    divisor = bx * ay - ax * by
+
+    if divisor == 0:
+        return 0, 0
+
+    if top % divisor != 0:
+        return 0, 0
+    B = top // divisor
+
+    top = px * ay - B * bx * ay
+    divisor = ax * ay
+
+    if top % divisor != 0:
+        return 0, 0
+
+    if divisor == 0:
+        return 0, 0
+
+    A = top / divisor
+    if A < 0 or B < 0:
+        return 0, 0
+    return A, B
+
+
 start_time = time()
 for A, b in games:
     # Solve the integer linear system
-    x, residuals, _, _ = np.linalg.lstsq(A, b, rcond=None)
+    x = solve(A, b)
     integer_solution = np.round(x).astype(int)
+    total_cost += 3 * integer_solution[0] + integer_solution[1]
 
-    # Check if the integer solution is valid
-    if np.allclose(np.dot(A, integer_solution), b, rtol=0):
-        total_cost += integer_solution[0] + integer_solution[1]
-        prizes += 1
 
 print(total_cost)
 print("--- %s seconds ---" % (time() - start_time))
