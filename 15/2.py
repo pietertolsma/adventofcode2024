@@ -1,3 +1,5 @@
+from collections import deque
+
 import copy
 from time import time
 
@@ -57,13 +59,9 @@ def calculate_final_score(boxes):
 
 
 def shift_positions(positions, dr, dc):
-    original = copy.deepcopy(grid)
-    pos = set(positions)
-
-    for [r, c] in positions:
-        if (r - dr, c - dc) not in pos:
-            grid[r][c] = "."
-        grid[r + dr][c + dc] = original[r][c]
+    for [r, c] in positions[::-1]:
+        grid[r + dr][c + dc] = grid[r][c]
+        grid[r][c] = "."
     return grid
 
 
@@ -73,38 +71,45 @@ def print_grid():
             file.write("".join(line) + "\n")
 
 
-def find_free_positions(r, c, dr, dc, seen):
-    if not in_range(r, c):
-        return False, []
-    if (r, c) in seen:
-        return True, []
-    if grid[r][c] == ".":
-        return True, []
-    if grid[r][c] == "#":
-        return False, []
+def find_free_positions(start_r, start_c, dr, dc):
+    queue = deque([(start_r, start_c)])
+    seen = set()
+    free_positions = []
 
-    seen.add((r, c))
-    if grid[r][c] == "[" and dr == 0:
-        stat, others = find_free_positions(r + dr, c + 2, dr, dc, seen)
-        return stat, [(r, c), (r + dr, c + dc)] + others
-    if grid[r][c] == "]" and dr == 0:
-        stat, others = find_free_positions(r + dr, c - 2, dr, dc, seen)
-        return stat, [(r, c), (r + dr, c + dc)] + others
+    while queue:
+        r, c = queue.popleft()
 
-    loffset = -1 if grid[r][c] == "]" else 1
-    stat, side_positions = find_free_positions(r, c + loffset, dr, dc, seen)
-    stat2, side_positions2 = find_free_positions(r + dr, c + dc, dr, dc, seen)
-    merged = list(set(side_positions) | set(side_positions2))
-    if not stat2 or not stat:
-        return False, []
-    return True, [(r, c)] + merged
+        if not in_range(r, c) or (r, c) in seen:
+            continue
+
+        seen.add((r, c))
+
+        if grid[r][c] == ".":
+            continue
+        elif grid[r][c] == "#":
+            return False, []
+
+        free_positions.append((r, c))
+        if dr == 0:
+            if grid[r][c] == "[":
+                free_positions.append((r, c + 1))
+                queue.append((r, c + 2))
+            elif grid[r][c] == "]":
+                free_positions.append((r, c - 1))
+                queue.append((r, c - 2))
+        else:
+            loffset = -1 if grid[r][c] == "]" else 1
+            queue.append((r, c + loffset))
+            queue.append((r + dr, c + dc))
+
+    return True, free_positions
 
 
 def simulate_robot(r, c):
     dirmap = {"^": (-1, 0), "<": (0, -1), ">": (0, 1), "v": (1, 0)}
     for i, move in enumerate(moves):
         dr, dc = dirmap[move]
-        valid, positions = find_free_positions(r + dr, c + dc, dr, dc, set())
+        valid, positions = find_free_positions(r + dr, c + dc, dr, dc)
         if valid:
             shift_positions(positions, dr, dc)
             grid[r + dr][c + dc] = "@"
