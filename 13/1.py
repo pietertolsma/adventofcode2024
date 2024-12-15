@@ -28,6 +28,19 @@ for match in matches:
     )
 
 
+# Try to divide as much as possible with button B,
+# such that the remainder is still divisible by button B.
+# P = c * A + b * B
+# P - b * B = c * A s.t. b is maximized?
+# b = (c * A - P) / -B
+# b = (c * xA + c * yA - xP - yP) * (-xB - yB)^(-1) = (c * A) / (-B) - P / (-B)
+# b" (w.r.t. c) = A / -B
+
+# A / -B = (c*A - P) / -B
+# A = c * A - P
+# c = (A - P) / A
+
+
 total_cost = 0
 prizes = 0
 for A, b in games:
