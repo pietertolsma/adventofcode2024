@@ -1,6 +1,4 @@
 from collections import deque
-
-import copy
 from time import time
 
 file = "data.txt"
